@@ -11,9 +11,10 @@ func main() {
 	http.HandleFunc("/", handler.IndexHandler)
 	http.HandleFunc("/api/time-series", handler.ApiHandler)
 
-	// Start the server
-	log.Println("Server running on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
+	serverAddress := ":8080"
+	log.Printf("INFO: Server is running on http://localhost%s", serverAddress)
+	err := http.ListenAndServe(serverAddress, nil)
+	if err != nil {
+		log.Fatalf("ERROR: Failed to start server: %v", err)
 	}
 }

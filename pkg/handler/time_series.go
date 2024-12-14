@@ -1,18 +1,22 @@
 package handler
 
 import (
-	"log"
 	"encoding/json"
-	"net/http"
 	"github.com/IamSarojtmg/quod-project/pkg/model"
 	"html/template"
+	"log"
+	"net/http"
+	"time"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now() // Record start time for logging
+
 	data, delta := model.GenerateTimeSeries()
 	log.Println("Rendering time series data")
-	tmpl := template.Must(template.ParseFiles("web\\templates\\index.html"))
-	tmpl.Execute(w, struct {
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
+
+	err := tmpl.Execute(w, struct {
 		Data    []model.TimeSeries
 		Start   int
 		End     int
@@ -25,11 +29,24 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Delta:   delta,
 		Current: data[len(data)-1].Value,
 	})
+	if err != nil {
+		log.Printf("ERROR: Failed to render template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("INFO: %s %s [200 OK] - %v", r.Method, r.URL.Path, time.Since(start))
 }
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("API request received: /api/time-series")
+	start := time.Now() // Record start time for logging
 	data, _ := model.GenerateTimeSeries()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
+	err := json.NewEncoder(w).Encode(data)
+
+	if err != nil {
+		log.Printf("ERROR: Failed to encode JSON response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	log.Printf("INFO: %s %s [200 OK] - %v", r.Method, r.URL.Path, time.Since(start))
 }
