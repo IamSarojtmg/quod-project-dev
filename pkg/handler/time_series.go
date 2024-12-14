@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"github.com/IamSarojtmg/quod-project/pkg/model"
 	"html/template"
-	"log"
 	"net/http"
 	"time"
+		"log/slog"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now() // Record start time for logging
 
 	data, delta := model.GenerateTimeSeries()
-	log.Println("Rendering time series data")
-	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
+	slog.Info("Rendering time series data") // Use slog for simple informational logs
 
+	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	err := tmpl.Execute(w, struct {
 		Data    []model.TimeSeries
 		Start   int
@@ -30,23 +30,49 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Current: data[len(data)-1].Value,
 	})
 	if err != nil {
-		log.Printf("ERROR: Failed to render template: %v", err)
+		// Structured error logging with additional context
+		slog.Error("Failed to render template",
+			"error", err,
+			"path", r.URL.Path,
+			"method", r.Method,
+		)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("INFO: %s %s [200 OK] - %v", r.Method, r.URL.Path, time.Since(start))
+
+	// Log successful request processing with additional details
+	slog.Info("Request handled successfully",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"status", http.StatusOK,
+		"duration", time.Since(start),
+	)
 }
+
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now() // Record start time for logging
+
 	data, _ := model.GenerateTimeSeries()
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
-
 	if err != nil {
-		log.Printf("ERROR: Failed to encode JSON response: %v", err)
+		// Structured error logging
+		slog.Error("Failed to encode JSON response",
+			"error", err,
+			"path", r.URL.Path,
+			"method", r.Method,
+		)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("INFO: %s %s [200 OK] - %v", r.Method, r.URL.Path, time.Since(start))
+
+	// Log successful request processing
+	slog.Info("API request handled successfully",
+		"method", r.Method,
+		"path", r.URL.Path,
+		"status", http.StatusOK,
+		"duration", time.Since(start),
+	)
 }
+
