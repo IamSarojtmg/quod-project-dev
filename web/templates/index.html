@@ -9,19 +9,6 @@
   <link rel="stylesheet" href="/web/style/style.css" />
 </head>
 <style>
-#startTemp {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #1a56db;
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 5px 10px;
-  border-radius: 5px;
-  z-index: 10; /* Ensure this is on top of the chart */
-}
-
   html, body {
     margin: 0;
     padding: 0;
@@ -88,6 +75,10 @@
 <body>
   <header>
     <h1>Temperature Over Time</h1>
+    <p>
+      <strong>Start Temperature:</strong>
+      <span id="startTemp">0</span>°F
+    </p>
     <p><strong>End Temperature:</strong> <span id="endTemp">0</span>°F</p>
     <p><strong>Delta:</strong> <span id="deltaTemp">0</span></p>
     <p>
@@ -95,25 +86,21 @@
       <span id="currentTemp">0</span>°F
     </p>
   </header>
-  <p>
-    <strong>Start Temperature:</strong>
-    <span id="startTemp">0</span>°F
-  </p>
   <main>
     <div id="temperatureChart">
       <!-- Start Temperature Label -->
       <div class="startTempLabel" id="startTempLabel">Start Temp: 0°F</div>
     </div>
-    <!-- <button
-      class="ref-btn"
-      hx-get="/api/time-series"
-      hx-swap="none"
-      hx-trigger="click"
-      onclick="fetchData()"
-    >
-      Refresh Data
-    </button> -->
   </main>
+  <button
+    class="ref-btn"
+    hx-get="/api/time-series"
+    hx-swap="none"
+    hx-trigger="click"
+    onclick="fetchData()"
+  >
+    Refresh Data
+  </button>
 
   <script>
     let chart;
@@ -171,7 +158,10 @@
       chart = new ApexCharts(document.getElementById("temperatureChart"), options);
       chart.render();
 
-      fetchData();
+
+    fetchData();
+
+
     });
 
     async function fetchData() {
@@ -192,10 +182,10 @@
         document.getElementById("deltaTemp").textContent = deltaTemperature;
         document.getElementById("currentTemp").textContent = currentTemperature;
 
-        // Update the start temperature label inside the chart element
-        document.getElementById("startTempLabel").textContent = `Start Temp: ${startTemperature}°F`;
 
         chart.updateOptions({
+    
+          
           series: [{ name: "Temperature (°F)", data: values }],
           xaxis: { categories: labels },
         });
