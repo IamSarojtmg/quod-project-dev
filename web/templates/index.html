@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +10,8 @@
   <link rel="stylesheet" href="/web/style/style.css" />
 </head>
 <style>
-  html, body {
+  html,
+  body {
     margin: 0;
     padding: 0;
     display: flex;
@@ -17,39 +19,68 @@
     align-items: center;
     font-family: "Inter", sans-serif;
   }
+
   body {
     width: 50%;
     margin-top: 20px;
   }
+
   header {
     text-align: center;
+    /* border: solid; */
   }
+
   header p {
     margin: 5px 0;
   }
+
   main {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    align-items: center;
     width: 100%;
+    border: solid;
+    border-radius: 20px;
+    padding: 15px;
+    height: 50vh;
   }
+
+  section {
+    border: solid green;
+    display: flex;
+    height: 100%;
+    gap: 5%;
+
+  }
+
   #temperatureChart {
-    width: 100%;
-    height: 350px;
-    position: relative; /* To position the start temperature inside it */
+    width: 80%;
+
+    /* position: relative; */
+
+    border: dotted;
+    display: flex;
+    align-items: end;
   }
-  .startTempLabel {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #1a56db;
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 5px 10px;
-    border-radius: 5px;
+
+  .tempInfo {
+    border: solid;
+    width: 20%;
   }
+
+  .start {
+    border: solid 1px;
+    /* height: 50px; */
+    display: flex;
+    align-items: center;
+  }
+
+  #startTemp {
+    padding: 10px;
+    /* border: solid; */
+    border-radius: 40px;
+
+  }
+
   .ref-btn {
     width: 20%;
     padding: 10px 15px;
@@ -58,49 +89,57 @@
     border-radius: 5px;
     transition: background-color 0.3s, transform 0.2s;
   }
+
   .ref-btn:hover {
     background-color: rgba(135, 206, 235, 1);
   }
+
   @media (max-width: 768px) {
     body {
       min-width: 400px;
       margin: 10px;
     }
+
     .ref-btn {
       min-width: 100px;
       padding: 10px 15px;
     }
   }
 </style>
+
 <body>
   <header>
     <h1>Temperature Over Time</h1>
-    <p>
-      <strong>Start Temperature:</strong>
-      <span id="startTemp">0</span>°F
-    </p>
-    <p><strong>End Temperature:</strong> <span id="endTemp">0</span>°F</p>
-    <p><strong>Delta:</strong> <span id="deltaTemp">0</span></p>
-    <p>
-      <strong>Current Temperature:</strong>
-      <span id="currentTemp">0</span>°F
-    </p>
   </header>
   <main>
-    <div id="temperatureChart">
-      <!-- Start Temperature Label -->
-      <div class="startTempLabel" id="startTempLabel">Start Temp: 0°F</div>
-    </div>
+    <h2>
+      <strong>Delta:</strong> <span id="deltaTemp">0</span>
+    </h2>
+    <section>
+
+      <div id="temperatureChart"></div>
+      <div class="tempInfo">
+
+        <p class="start">
+          <span id="startTemp">0°F</span>
+          <strong>Start</strong>
+        <p><span id="endTemp">0</span>°F <strong>End</strong></p>
+        <p>
+          <span id="currentTemp">0</span>°F <strong>Now</strong>
+        </p>
+        </p>
+      </div>
+    </section>
   </main>
-  <button
-    class="ref-btn"
-    hx-get="/api/time-series"
-    hx-swap="none"
-    hx-trigger="click"
-    onclick="fetchData()"
-  >
-    Refresh Data
-  </button>
+  <!-- <button
+      class="ref-btn"
+      hx-get="/api/time-series"
+      hx-swap="none"
+      hx-trigger="click"
+      onclick="fetchData()"
+    >
+      Refresh Data
+    </button> -->
 
   <script>
     let chart;
@@ -108,7 +147,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const options = {
         chart: {
-          height: "100%",
+          height: "50%",
           type: "area",
           fontFamily: "Inter, sans-serif",
           toolbar: {
@@ -155,13 +194,13 @@
         },
       };
 
-      chart = new ApexCharts(document.getElementById("temperatureChart"), options);
+      chart = new ApexCharts(
+        document.getElementById("temperatureChart"),
+        options
+      );
       chart.render();
 
-
-    fetchData();
-
-
+      fetchData();
     });
 
     async function fetchData() {
@@ -177,15 +216,17 @@
         const deltaTemperature = endTemperature - startTemperature;
         const currentTemperature = endTemperature;
 
-        document.getElementById("startTemp").textContent = startTemperature;
+        document.getElementById("startTemp").textContent = startTemperature + "°F";
         document.getElementById("endTemp").textContent = endTemperature;
         document.getElementById("deltaTemp").textContent = deltaTemperature;
-        document.getElementById("currentTemp").textContent = currentTemperature;
+        document.getElementById("currentTemp").textContent =
+          currentTemperature;
+        if (startTemperature >= 60 && startTemperature < 70) {
+          startTemp.style.backgroundColor = "green";
 
+        }
 
         chart.updateOptions({
-    
-          
           series: [{ name: "Temperature (°F)", data: values }],
           xaxis: { categories: labels },
         });
@@ -195,4 +236,5 @@
     }
   </script>
 </body>
+
 </html>
