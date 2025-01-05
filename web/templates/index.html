@@ -9,6 +9,7 @@
   <script src="https://unpkg.com/htmx.org"></script>
   <link rel="stylesheet" href="/web/style/style.css" />
 </head>
+
 <style>
   html,
   body {
@@ -27,7 +28,6 @@
 
   header {
     text-align: center;
-    /* border: solid; */
   }
 
   header p {
@@ -37,47 +37,64 @@
   main {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 500px;
     border: solid;
     border-radius: 20px;
     padding: 15px;
-    height: 50vh;
+    height: 40vh;
   }
 
   section {
-    border: solid green;
     display: flex;
     height: 100%;
     gap: 5%;
-
   }
 
   #temperatureChart {
     width: 80%;
-
-    /* position: relative; */
-
     border: dotted;
     display: flex;
     align-items: end;
   }
 
   .tempInfo {
-    border: solid;
     width: 20%;
+    /* border: solid; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
   }
 
-  .start {
-    border: solid 1px;
-    /* height: 50px; */
+  .start-container,
+  .end-container,
+  .current-container {
     display: flex;
     align-items: center;
+    position: relative;
   }
 
-  #startTemp {
-    padding: 10px;
+  #startTemp,
+  #endTemp,
+  #currentTemp {
+    border-radius: 50%;
     /* border: solid; */
-    border-radius: 40px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+
+  }
+
+  .tempDetail {
+    position: absolute;
+    width: 80%;
+    right: 0px;
+    z-index: -1;
+    text-align: center;
+    font-size: 12px;
+    right: 0px;
 
   }
 
@@ -115,31 +132,38 @@
     <h2>
       <strong>Delta:</strong> <span id="deltaTemp">0</span>
     </h2>
-    <section>
 
+
+    <section>
       <div id="temperatureChart"></div>
       <div class="tempInfo">
+        <div class="start-container">
 
-        <p class="start">
-          <span id="startTemp">0°F</span>
-          <strong>Start</strong>
-        <p><span id="endTemp">0</span>°F <strong>End</strong></p>
-        <p>
-          <span id="currentTemp">0</span>°F <strong>Now</strong>
-        </p>
-        </p>
+          <span id="startTemp"></span>
+          <p class="tempDetail">Start</p>
+
+        </div>
+        <div class="end-container">
+
+          <span id="endTemp"></span>
+          <p class="tempDetail">End</p>
+          </p>
+        </div>
+        <div class="current-container">
+
+          <span id="currentTemp"></span>
+          <p class="tempDetail">Now</p>
+        </div>
+
       </div>
     </section>
+
+
+
   </main>
-  <!-- <button
-      class="ref-btn"
-      hx-get="/api/time-series"
-      hx-swap="none"
-      hx-trigger="click"
-      onclick="fetchData()"
-    >
-      Refresh Data
-    </button> -->
+  <button class="ref-btn" hx-get="/api/time-series" hx-swap="none" hx-trigger="click" onclick="fetchData()">
+    Refresh Data
+  </button>
 
   <script>
     let chart;
@@ -147,7 +171,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const options = {
         chart: {
-          height: "50%",
+          height: "65%",
           type: "area",
           fontFamily: "Inter, sans-serif",
           toolbar: {
@@ -217,14 +241,22 @@
         const currentTemperature = endTemperature;
 
         document.getElementById("startTemp").textContent = startTemperature + "°F";
-        document.getElementById("endTemp").textContent = endTemperature;
-        document.getElementById("deltaTemp").textContent = deltaTemperature;
-        document.getElementById("currentTemp").textContent =
-          currentTemperature;
-        if (startTemperature >= 60 && startTemperature < 70) {
-          startTemp.style.backgroundColor = "green";
+        document.getElementById("endTemp").textContent = endTemperature + "°F";
+        document.getElementById("deltaTemp").textContent = deltaTemperature
+        document.getElementById("currentTemp").textContent = currentTemperature + "°F";
 
-        }
+        const getBackgroundColor = (temp) => {
+          if (temp < 50) return "#008000";
+          if (temp < 60) return "#FFFF00";
+          if (temp < 71) return "#FFA500";
+          return "#B36262";
+        };
+
+        startTemp.style.backgroundColor = getBackgroundColor(startTemperature);
+        endTemp.style.backgroundColor = getBackgroundColor(endTemperature);
+        currentTemp.style.backgroundColor = getBackgroundColor(currentTemperature);
+
+
 
         chart.updateOptions({
           series: [{ name: "Temperature (°F)", data: values }],
@@ -234,6 +266,8 @@
         console.error("Error fetching or rendering data:", error);
       }
     }
+
+
   </script>
 </body>
 
