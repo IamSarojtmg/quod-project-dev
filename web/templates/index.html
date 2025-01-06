@@ -256,6 +256,27 @@
         endTemp.style.backgroundColor = getBackgroundColor(endTemperature);
         currentTemp.style.backgroundColor = getBackgroundColor(currentTemperature);
 
+        const setColorOnTemp = (temp) => {
+          if (temp < 50) return "#32CD32"; // Lighter green
+          if (temp < 60) return "#FFFF66"; // Softer yellow
+          if (temp < 71) return "#FFB347"; // Lighter orange
+          return "#D98888"; // Softer red
+        };
+
+        const tempDetail = document.querySelectorAll(".tempDetail");
+        tempDetail.forEach((temp, index) => {
+
+            if (index === 0) {
+              temp.style.backgroundColor = setColorOnTemp(startTemperature);
+            } else if (index === 1) {
+              temp.style.backgroundColor = setColorOnTemp(endTemperature);
+            } else if (index === 2) {
+              temp.style.backgroundColor = setColorOnTemp(currentTemperature);
+            }
+
+
+
+        });
 
 
         chart.updateOptions({
