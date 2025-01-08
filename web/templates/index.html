@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,299 +8,36 @@
   <script src="https://unpkg.com/htmx.org"></script>
   <link rel="stylesheet" href="/web/style/style.css" />
 </head>
-
-<style>
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: "Inter", sans-serif;
-    height: 100%;
-    background: rgb(241, 238, 238); 
-    z-index: -1;
-  }
-
-  body {
-    width: 50%;
-    margin-top: 20px;
-  }
-
-  header {
-    text-align: center;
-  }
-
-  header p {
-    margin: 5px 0;
-  }
-
-  main {
-    display: flex;
-    flex-direction: column;
-    width: 500px;
-    border: solid 2px rgba(0, 0, 0, 0.1); /* Soft border */
-    border-radius: 20px;
-    padding: 15px;
-    height: 40vh;
-    background-color: white;
-    z-index: inherit;
-    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.2), -8px -8px 15px rgba(255, 255, 255, 0.7);
-     margin-bottom: 20px;
-
-  }
-
-  section {
-    display: flex;
-    height: 100%;
-    gap: 5%;
-  }
-
-  #temperatureChart {
-    width: 80%;
-    display: flex;
-    align-items: end;
-    /* border: solid; */
-  }
-
-  .tempInfo {
-    width: 20%;
-    /* border: solid; */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-  }
-
-  .start-container,
-  .end-container,
-  .current-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-
-  #startTemp,
-  #endTemp,
-  #currentTemp {
-    border-radius: 50%;
-    /* border: solid; */
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-
-  }
-
-  .tempDetail {
-    position: absolute;
-    width: 80%;
-    right: 0px;
-    z-index: -1;
-    text-align: center;
-    font-size: 12px;
-    right: 0px;
-
-  }
-
-  .ref-btn {
-    width: 20%;
-    padding: 10px 15px;
-    height: auto;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s, transform 0.2s;
-    background-color: white;
-  }
-
-  .ref-btn:hover {
-    background-color: rgba(135, 206, 235, 1);
-  }
-
-  @media (max-width: 768px) {
-    body {
-      min-width: 400px;
-      margin: 10px;
-    }
-
-    .ref-btn {
-      min-width: 100px;
-      padding: 10px 15px;
-    }
-  }
-</style>
-
 <body>
   <header>
     <h1>Temperature Over Time</h1>
   </header>
   <main>
-    <h1 >
+    <h1>
       <span id="deltaTemp"> Delta 0</span>
     </h1>
-
-
     <section>
       <div id="temperatureChart"></div>
       <div class="tempInfo">
         <div class="start-container">
-
           <span id="startTemp"></span>
           <p class="tempDetail">Start</p>
-
         </div>
         <div class="end-container">
-
           <span id="endTemp"></span>
           <p class="tempDetail">End</p>
-          </p>
         </div>
         <div class="current-container">
-
           <span id="currentTemp"></span>
           <p class="tempDetail">Now</p>
         </div>
-
       </div>
     </section>
-
-
-
   </main>
   <button class="ref-btn" hx-get="/api/time-series" hx-swap="none" hx-trigger="click" onclick="fetchData()">
     Refresh Data
   </button>
-
-  <script>
-    let chart;
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const options = {
-        chart: {
-          height: "65%",
-          type: "area",
-          fontFamily: "Inter, sans-serif",
-          toolbar: {
-            show: false,
-          },
-        },
-        tooltip: {
-          enabled: true,
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            opacityFrom: 0.55,
-            opacityTo: 0,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: "smooth",
-          width: 6,
-        },
-        grid: {
-          show: false,
-        },
-        series: [
-          {
-            name: "Temperature (°F)",
-            data: [],
-            color: "#1A56DB",
-          },
-        ],
-        xaxis: {
-          categories: [],
-          labels: {
-            style: {
-              colors: "#6B7280",
-            },
-            offsetX: 1,
-          },
-        },
-        yaxis: {
-          show: false,
-        },
-      };
-
-      chart = new ApexCharts(
-        document.getElementById("temperatureChart"),
-        options
-      );
-      chart.render();
-
-      fetchData();
-    });
-
-    async function fetchData() {
-      try {
-        const response = await fetch("/api/time-series", { method: "GET" });
-        const data = await response.json();
-
-        const labels = data.map((point) => point.Time);
-        const values = data.map((point) => point.Value);
-
-        const startTemperature = values[0];
-        const endTemperature = values[values.length - 1];
-        const deltaTemperature = endTemperature - startTemperature;
-        const currentTemperature = endTemperature;
-
-        document.getElementById("startTemp").textContent = startTemperature + "°F";
-        document.getElementById("endTemp").textContent = endTemperature + "°F";
-        document.getElementById("deltaTemp").textContent = "Delta: " + deltaTemperature
-        document.getElementById("currentTemp").textContent = currentTemperature + "°F";
-
-
-        deltaTemperature >=0 ? deltaTemp.style.color = "green" : deltaTemp.style.color = "#739BD0";
-        
-
-        const getBackgroundColor = (temp) => {
-          if (temp < 50) return "#008000";
-          if (temp < 60) return "#FFFF00";
-          if (temp < 71) return "#FFA500";
-          return "#B36262";
-        };
-
-        startTemp.style.backgroundColor = getBackgroundColor(startTemperature);
-        endTemp.style.backgroundColor = getBackgroundColor(endTemperature);
-        currentTemp.style.backgroundColor = getBackgroundColor(currentTemperature);
-
-        const setColorOnTemp = (temp) => {
-          if (temp < 50) return "#32CD32"; // Lighter green
-          if (temp < 60) return "#FFFF66"; // Softer yellow
-          if (temp < 71) return "#FFB347"; // Lighter orange
-          return "#D98888"; // Softer red
-        };
-
-        const tempDetail = document.querySelectorAll(".tempDetail");
-        tempDetail.forEach((temp, index) => {
-
-          if (index === 0) {
-            temp.style.backgroundColor = setColorOnTemp(startTemperature);
-          } else if (index === 1) {
-            temp.style.backgroundColor = setColorOnTemp(endTemperature);
-          } else if (index === 2) {
-            temp.style.backgroundColor = setColorOnTemp(currentTemperature);
-          }
-        });
-
-
-        chart.updateOptions({
-          series: [{ name: "Temperature (°F)", data: values }],
-          xaxis: { categories: labels },
-        });
-      } catch (error) {
-        console.error("Error fetching or rendering data:", error);
-      }
-    }
-
-
-  </script>
+  <script src="/web/js/fetchData.js"></script>
+  <script src="/web/js/chart.js"></script>
 </body>
-
 </html>
