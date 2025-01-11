@@ -7,12 +7,9 @@ import (
 )
 
 func main() {
-	// Serve static files from the "web" directory - needed to run the css and js via html file
 	staticFileServer := http.FileServer(http.Dir("./web"))
 	http.Handle("/web/", http.StripPrefix("/web", staticFileServer))
 
-
-	// Set up routes
 	http.HandleFunc("/", handler.IndexHandler)
 	http.HandleFunc("/api/time-series", handler.ApiHandler)
 

@@ -9,10 +9,10 @@ import (
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	start := time.Now() // Record start time for logging
+	start := time.Now()
 
 	data, delta := model.GenerateTimeSeries()
-	slog.Info("Rendering time series data") // Use slog for simple informational logs
+	slog.Info("Rendering time series data")
 
 	tmpl := template.Must(template.ParseFiles("web/templates/index.html"))
 	err := tmpl.Execute(w, struct {
@@ -29,7 +29,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Current: data[len(data)-1].Value,
 	})
 	if err != nil {
-		// Structured error logging with additional context
 		slog.Error("Failed to render template",
 			"error", err,
 			"path", r.URL.Path,
@@ -38,8 +37,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
-	// Log successful request processing with additional details
 	slog.Info("Request handled successfully",
 		"method", r.Method,
 		"path", r.URL.Path,
@@ -47,4 +44,3 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		"duration", time.Since(start),
 	)
 }
-

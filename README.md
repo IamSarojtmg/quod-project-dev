@@ -5,13 +5,13 @@ This application simulates temperature changes over time, updating every hour. I
 
 ## Tech used
 - Go (Golang): Backend server for generating time-series data.
-- Chart.js: JavaScript library for creating the dynamic chart on the front-end.
+- Apexcharts.js: JavaScript library for creating the dynamic chart on the front-end.
 - HTMX: Used for handling client-side interactions like fetching data without full page reloads.
 - HTML/CSS: For structuring and styling the front-end.
 
 ## Installation
 1. Clone the repository
-2. Run the server - `go run main.go`
+2. Run the server - `go run ./cmd/server`
 3. Open your browser and navigate to http://localhost:8080
 
 ## Usage
