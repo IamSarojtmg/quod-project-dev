@@ -9,13 +9,12 @@ import (
 )
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
-	start := time.Now() // Record start time for logging
+	start := time.Now()
 
 	data, _ := model.GenerateTimeSeries()
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
-		// Structured error logging
 		slog.Error("Failed to encode JSON response",
 			"error", err,
 			"path", r.URL.Path,
@@ -25,7 +24,6 @@ func ApiHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log successful request processing
 	slog.Info("API request handled successfully",
 		"method", r.Method,
 		"path", r.URL.Path,
