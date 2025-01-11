@@ -50,7 +50,6 @@ async function fetchData() {
         temp.style.backgroundColor = setColorOnTemp(currentTemperature);
       }
     });
-    console.log(chart);
 
     chart.updateOptions({
       series: [{ name: "Temperature (°F)", data: values }],
